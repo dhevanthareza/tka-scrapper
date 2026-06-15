@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Database & cache
+*.db
+*.sqlite
+*.sqlite3
+token_cache.json
+
+# Output & logs
+output/*.csv
+output/*.log
+*.log
+
+# Credentials
+config.yaml
+
+# Input data (large files)
+input/*.csv
+
+# OS
+.DS_Store
+Thumbs.db

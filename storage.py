@@ -154,7 +154,7 @@ def export_csv(path):
     rows = c.fetchall()
     conn.close()
 
-    headers = ["nisn","nama_siswa","npsn","sd","alamat","kecamatan","kelurahan","jml","tanggal_lahir",
+    headers = ["nisn","nama_siswa","npsn","sd","alamat","kecamatan","kelurahan","jml","tanggal_lahir","SUMBER_NAMA",
                "tka_ikut_tka","tka_jenjang","tka_kategori_1","tka_kategori_2","tka_kategori_3",
                "tka_kategori_4","tka_kategori_5","tka_nilai_1","tka_nilai_2","tka_nilai_3",
                "tka_nilai_4","tka_nilai_5","tka_nm_mapel_1","tka_nm_mapel_2","tka_nm_mapel_3",
@@ -165,10 +165,12 @@ def export_csv(path):
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()
         for nisn, nama, npsn, sd, alamat, kecamatan, kelurahan, jml, tgl_lahir, tka_data in rows:
+            flattened = _flatten_tka(tka_data)
             base = {
                 "nisn": nisn, "nama_siswa": nama, "npsn": npsn,
                 "sd": sd, "alamat": alamat, "kecamatan": kecamatan,
-                "kelurahan": kelurahan, "jml": jml, "tanggal_lahir": tgl_lahir
+                "kelurahan": kelurahan, "jml": jml, "tanggal_lahir": tgl_lahir,
+                "SUMBER_NAMA": "api"
             }
-            base.update(_flatten_tka(tka_data))
+            base.update(flattened)
             writer.writerow(base)

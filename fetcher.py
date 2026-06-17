@@ -15,7 +15,7 @@ def fetch_all_siswa():
         page = 1
         while True:
             try:
-                data = client.get_siswa_by_npsn(npsn, page=page, per_page=100)
+                data = client.get_siswa_by_npsn(npsn, page=page, per_page=150)
             except Exception as e:
                 log_error("siswa", npsn, page, e)
                 print(f"  ERROR fetch siswa NPSN {npsn} page {page}: {e}")
@@ -34,12 +34,13 @@ def fetch_all_siswa():
                 save_siswa(rows)
                 print(f"  Saved {len(rows)} siswa")
             
-            if len(data.get("data", [])) < 100:
+            if len(data.get("data", [])) < 150:
                 break
             page += 1
-            time.sleep(0.5)
+            time.sleep(0.1)
         
-        time.sleep(0.5)
+        time.sleep(0.1)
+        print(f"  Done NPSN {npsn}")
     
     print("Done fetching all siswa.")
 
@@ -62,7 +63,7 @@ def fetch_all_tka():
                 continue
             
             save_tka(nisn, data)
-            time.sleep(0.3)
+            time.sleep(0.05)
         
         print(f"  Batch done. Continuing...")
     

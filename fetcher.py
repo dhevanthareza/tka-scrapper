@@ -23,8 +23,12 @@ def fetch_all_siswa():
             
             rows = []
             for item in data.get("data", []):
+                nisn = item.get("nisn")
+                if nisn is None or nisn == "":
+                    print(f"  SKIP siswa tanpa NISN: {item.get('nama')}")
+                    continue
                 rows.append((
-                    item.get("nisn"),
+                    nisn,
                     item.get("nama"),
                     npsn,
                     item.get("tanggal_lahir")

@@ -24,6 +24,8 @@ def init_db():
             nama TEXT,
             npsn TEXT,
             tanggal_lahir TEXT,
+            nik TEXT,
+            no_kk TEXT,
             fetched_tka INTEGER DEFAULT 0,
             tka_data TEXT
         )
@@ -82,7 +84,7 @@ def get_npsn_list():
 def save_siswa(rows):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    c.executemany("INSERT OR IGNORE INTO siswa (nisn, nama, npsn, tanggal_lahir) VALUES (?, ?, ?, ?)", rows)
+    c.executemany("INSERT OR IGNORE INTO siswa (nisn, nama, npsn, tanggal_lahir, nik, no_kk) VALUES (?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
     conn.close()
 
@@ -146,7 +148,7 @@ def export_csv(path):
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute("""
-        SELECT s.nisn, s.nama, s.npsn, si.sd, si.alamat, si.kecamatan, si.kelurahan, si.jml, s.tanggal_lahir, s.tka_data
+        SELECT s.nisn, s.nama, s.npsn, s.nik, s.no_kk, si.sd, si.alamat, si.kecamatan, si.kelurahan, si.jml, s.tanggal_lahir, s.tka_data
         FROM siswa s
         JOIN sekolah_input si ON s.npsn = si.npsn
         WHERE s.fetched_tka = 1
@@ -154,7 +156,7 @@ def export_csv(path):
     rows = c.fetchall()
     conn.close()
 
-    headers = ["nisn","nama_siswa","npsn","sd","alamat","kecamatan","kelurahan","jml","tanggal_lahir","SUMBER_NAMA",
+    headers = ["nisn","nama_siswa","npsn","nik","no_kk","sd","alamat","kecamatan","kelurahan","jml","tanggal_lahir","SUMBER_NAMA",
                "tka_ikut_tka","tka_jenjang","tka_kategori_1","tka_kategori_2","tka_kategori_3",
                "tka_kategori_4","tka_kategori_5","tka_nilai_1","tka_nilai_2","tka_nilai_3",
                "tka_nilai_4","tka_nilai_5","tka_nm_mapel_1","tka_nm_mapel_2","tka_nm_mapel_3",
@@ -164,10 +166,11 @@ def export_csv(path):
     with open(path, "w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=headers)
         writer.writeheader()
-        for nisn, nama, npsn, sd, alamat, kecamatan, kelurahan, jml, tgl_lahir, tka_data in rows:
+        for nisn, nama, npsn, nik, no_kk, sd, alamat, kecamatan, kelurahan, jml, tgl_lahir, tka_data in rows:
             flattened = _flatten_tka(tka_data)
             base = {
                 "nisn": nisn, "nama_siswa": nama, "npsn": npsn,
+                "nik": nik, "no_kk": no_kk,
                 "sd": sd, "alamat": alamat, "kecamatan": kecamatan,
                 "kelurahan": kelurahan, "jml": jml, "tanggal_lahir": tgl_lahir,
                 "SUMBER_NAMA": "api"

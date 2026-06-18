@@ -31,7 +31,9 @@ def fetch_all_siswa():
                     nisn,
                     item.get("nama"),
                     npsn,
-                    item.get("tanggal_lahir")
+                    item.get("tanggal_lahir"),
+                    item.get("nik"),
+                    item.get("no_kk")
                 ))
             
             if rows:

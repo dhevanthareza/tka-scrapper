@@ -6,7 +6,7 @@ from pathlib import Path
 DB_PATH = Path(__file__).parent / "progress.db"
 
 def init_db():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("""
         CREATE TABLE IF NOT EXISTS sekolah_input (
@@ -44,7 +44,7 @@ def init_db():
     conn.close()
 
 def log_error(step, identifier, page, error):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("INSERT INTO error_log (step, identifier, page, error, ts) VALUES (?, ?, ?, ?, ?)",
               (step, identifier, page, str(error), int(time.time())))
@@ -52,7 +52,7 @@ def log_error(step, identifier, page, error):
     conn.close()
 
 def get_errors():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("SELECT step, identifier, page, error, ts FROM error_log ORDER BY ts DESC")
     rows = c.fetchall()
@@ -61,7 +61,7 @@ def get_errors():
 
 def load_input_csv(csv_path):
     import csv
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     with open(csv_path, "r", encoding="utf-8") as f:
         reader = csv.DictReader(f)
@@ -74,7 +74,7 @@ def load_input_csv(csv_path):
     conn.close()
 
 def get_npsn_list():
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("SELECT npsn, sd, alamat, kecamatan, kelurahan, jml FROM sekolah_input")
     rows = c.fetchall()
@@ -82,14 +82,14 @@ def get_npsn_list():
     return rows
 
 def save_siswa(rows):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.executemany("INSERT OR IGNORE INTO siswa (nisn, nama, npsn, tanggal_lahir, nik, no_kk) VALUES (?, ?, ?, ?, ?, ?)", rows)
     conn.commit()
     conn.close()
 
 def get_unfetched_tka(batch=100):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("SELECT nisn, tanggal_lahir FROM siswa WHERE fetched_tka = 0 LIMIT ?", (batch,))
     rows = c.fetchall()
@@ -97,7 +97,7 @@ def get_unfetched_tka(batch=100):
     return rows
 
 def save_tka(nisn, data):
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("UPDATE siswa SET fetched_tka = 1, tka_data = ? WHERE nisn = ?", (json.dumps(data, ensure_ascii=False), nisn))
     conn.commit()
@@ -145,7 +145,7 @@ def _flatten_tka(tka_json):
 
 def export_csv(path):
     import csv
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH, timeout=30.0)
     c = conn.cursor()
     c.execute("""
         SELECT s.nisn, s.nama, s.npsn, s.nik, s.no_kk, si.sd, si.alamat, si.kecamatan, si.kelurahan, si.jml, s.tanggal_lahir, s.tka_data
